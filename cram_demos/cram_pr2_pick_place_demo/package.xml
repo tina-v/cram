@@ -42,6 +42,8 @@
   <depend>cram_fetch_deliver_plans</depend>
   <depend>cram_urdf_environment_manipulation</depend>
 
+  <depend>cram_ralf_costmaps</depend>
+
   <depend>cram_pr2_description</depend>
   <depend>cram_boxy_description</depend>
   <depend>cram_donbot_description</depend>

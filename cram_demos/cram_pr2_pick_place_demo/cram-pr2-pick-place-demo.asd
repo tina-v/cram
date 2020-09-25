@@ -69,6 +69,8 @@
                cram-fetch-deliver-plans
                cram-urdf-environment-manipulation
 
+               cram-ralf-costmaps
+
                cram-pr2-description
                cram-boxy-description
                cram-donbot-description
