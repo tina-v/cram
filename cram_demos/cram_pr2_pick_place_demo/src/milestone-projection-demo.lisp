@@ -62,23 +62,23 @@
 (defparameter *delivery-poses-dining-table-relative*
   `((:bowl
      "dining_area_jokkmokk_table_main"
-     ((-0.46 -0.012 0.7991485595703125d0)
+     ((-0.46 -0.012 0.449148565530777d0)
       (0.0d0 0.0d0 0.4550555463557553d0 0.8904630535462239d0)))
     (:cup
      "dining_area_jokkmokk_table_main"
-     ((-0.283 -0.0975 0.8241376876831055d0)
+     ((-0.283 -0.0975 0.47413769364356995d0)
       (0.0d0 0.0d0 0.9542005181967461d0 0.299167797520156d0)))
     (:spoon
      "dining_area_jokkmokk_table_main"
-     ((-0.46 -0.2016 0.755256716410319d0)
+     ((-0.46 -0.2016 0.4052567223707835d0)
       (0 0 0 1)))
     (:milk
      "dining_area_jokkmokk_table_main"
-     ((-0.012 -0.031 0.8362768809000651d0)
+     ((-0.012 -0.031 0.4862768868605296d0)
       (-0.00932157 0.00720728 0.965580536 0.25983724)))
     (:breakfast-cereal
      "dining_area_jokkmokk_table_main"
-     ((-0.012 -0.23 0.850479253133138d0)
+     ((-0.012 -0.23 0.5004792590936025d0)
       (-0.0079082 0.00397635 0.08238571 0.9965611543)))))
 
 
@@ -99,10 +99,7 @@
                 0.7164095640182495d0
                 0.696520984172821d0)))
     (:milk . ((-3.3491180419921873d0 0.29785102208455405d0 0.8362768809000651d0)
-              (-0.01168766152113676d0
-               -0.0014950307086110115d0
-               0.8665012121200562d0
-               -0.49903586506843567d0)))
+              (0 0 0 1)))
     (:breakfast-cereal . ((-3.150148 0.298135248819987d0 0.850479253133138d0)
                           (-0.008403636515140533d0
                            -0.002780231647193432d0
@@ -212,6 +209,9 @@ Converts these coordinates into CRAM-TF:*FIXED-FRAME* frame and returns a list i
 
 (defun setting-demo (&optional (object-list '(:bowl :spoon :cup
                                               :milk :breakfast-cereal)))
+
+  (experiment-log-start-demo-run)
+
   (initialize)
   (setf btr:*visibility-threshold* 0.7)
   (when (or cram-projection:*projection-environment*
@@ -223,41 +223,56 @@ Converts these coordinates into CRAM-TF:*FIXED-FRAME* frame and returns a list i
   ;; (park-robot)
 
   (dolist (?object-type object-list)
-    (let* ((?deliver-pose (cram-tf:ensure-pose-in-frame
-                           (btr:ensure-pose
-                            (cdr (assoc ?object-type
-                                        *delivery-poses-dining-table-absolute*)))
-                           cram-tf:*fixed-frame*))
-           (?deliver-location (a location (pose ?deliver-pose)))
-           (?color (cdr (assoc ?object-type *object-colors*)))
-           (?arm (cdr (assoc ?object-type *object-arms*)))
-           (?material (cdr (assoc ?object-type *object-materials*)))
-           ;; (?grasp (cdr (assoc ?object-type *object-grasps*)))
-           (?object (an object
-                        (type ?object-type)
-                        ;; (location ?fetch-location)
-                        (desig:when ?color
-                          (color ?color))
-                        (desig:when ?material
-                          (material ?material)))))
-      (exe:perform
-       (an action
-           (type transporting)
-           (object ?object)
-           (context :table-setting)
-           ;; (grasps (:back :top :front))
-           (desig:when ?arm
-             (arms (?arm)))
-           ;; (desig:when ?grasp
-           ;;   (grasp ?grasp))
-           (target ?deliver-location)
-           )))))
+
+    (experiment-log-start-object-transport ?object-type)
+
+    (cpl:with-failure-handling
+        ((common-fail:high-level-failure (e)
+           (declare (ignore e))
+           (experiment-log-finish-object-transport-failed ?object-type)
+           (return)))
+
+      (let* ((?deliver-pose (cram-tf:ensure-pose-in-frame
+                             (btr:ensure-pose
+                              (cdr (assoc ?object-type
+                                          *delivery-poses-dining-table-absolute*)))
+                             cram-tf:*fixed-frame*))
+             (?deliver-location (a location (pose ?deliver-pose)))
+             (?color (cdr (assoc ?object-type *object-colors*)))
+             (?arm (cdr (assoc ?object-type *object-arms*)))
+             (?material (cdr (assoc ?object-type *object-materials*)))
+             ;; (?grasp (cdr (assoc ?object-type *object-grasps*)))
+             (?object (an object
+                          (type ?object-type)
+                          ;; (location ?fetch-location)
+                          (desig:when ?color
+                            (color ?color))
+                          (desig:when ?material
+                            (material ?material)))))
+        (exe:perform
+         (an action
+             (type transporting)
+             (object ?object)
+             (context :table-setting)
+             ;; (grasps (:back :top :front))
+             (desig:when ?arm
+               (arms (?arm)))
+             ;; (desig:when ?grasp
+             ;;   (grasp ?grasp))
+             (target ?deliver-location)
+             )))
+
+      (experiment-log-finish-object-transport-successful ?object-type))
+    (experiment-log-current-demo-run-failures *experiment-log-current-object*))
+  (experiment-log-finish-demo-run))
 
 (defun cleaning-demo (&optional (object-list '(:breakfast-cereal :milk
                                                :spoon :cup :bowl)))
   "Cleans up object to the designated locations by iterating over
 `object-list' "
   ;; (setup-for-demo object-list)
+  (experiment-log-start-demo-run)
+
   (initialize)
   (when (or cram-projection:*projection-environment*
             ;; dont want to add dependency on sim PMs, thus this stupid hack
@@ -265,14 +280,26 @@ Converts these coordinates into CRAM-TF:*FIXED-FRAME* frame and returns a list i
     (spawn-objects-on-fixed-spots
      :object-types object-list
      :spawning-poses-relative *delivery-poses-dining-table-relative*))
-
+  (setf fd-plans::*manipulate-environment* t)
   (dolist (?object-type object-list)
-    (let ((?grasps (when (eq ?object-type :cup)
-                     '(:front :back :left-side :right-side))))
-      (exe:perform
-       (desig:an action
-                 (type transporting)
-                 (object (desig:an object (type ?object-type)))
-                 (context table-cleaning)
-                 (desig:when ?grasps
-                   (grasps ?grasps)))))))
+    (experiment-log-start-object-transport ?object-type)
+    (cpl:with-failure-handling
+        ((common-fail:high-level-failure (e)
+           (declare (ignore e))
+           (experiment-log-finish-object-transport-failed ?object-type)
+           (return)))
+
+      (let ((?grasps (when (eq ?object-type :cup)
+                       '(:front :back :left-side :right-side))))
+        (when (eq ?object-type :bowl)
+          (setf fd-plans::*manipulate-environment* t))
+        (exe:perform
+         (desig:an action
+                   (type transporting)
+                   (object (desig:an object (type ?object-type)))
+                   (context table-cleaning)
+                   (desig:when ?grasps
+                     (grasps ?grasps)))))
+      (experiment-log-finish-object-transport-successful ?object-type))
+    (experiment-log-current-demo-run-failures *experiment-log-current-object*))
+  (experiment-log-finish-demo-run))

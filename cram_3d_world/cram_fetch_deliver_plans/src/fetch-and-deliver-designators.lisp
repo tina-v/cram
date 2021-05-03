@@ -106,12 +106,7 @@ the `look-pose-stamped'."
     ;; arm
     (-> (spec:property ?action-designator (:arm ?arm))
         (true)
-        (man-int:robot-free-hand ?robot ?arm)
-        ;; (and (man-int:robot-free-hand ?robot ?arm)
-        ;;      (-> (spec:property ?object-designator (:type :fridge))
-        ;;          (equal ?arm :right)
-        ;;          (equal ?arm :left)))
-        )
+        (man-int:robot-free-hand ?robot ?arm))
     ;; distance
     (once (or (spec:property ?action-designator (:distance ?distance))
               (equal ?distance NIL)))
@@ -207,7 +202,7 @@ the `look-pose-stamped'."
                                            ;; have to add the visibility
                                            ;; constraint as he reperceives
                                            ;; each time before grasping
-                                           ;; (:visible-for ?robot)
+                                           (:visible-for ?robot)
                                            )
                                 ?robot-location-designator)))
     ;; if the object is in the hand or its reference object is in the hand

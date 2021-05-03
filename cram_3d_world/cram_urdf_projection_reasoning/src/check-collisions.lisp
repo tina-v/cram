@@ -213,14 +213,16 @@ Store found pose into designator or throw error if good pose not found."
                             (roslisp:ros-warn (coll-check pick)
                                               "Robot is in collision with environment.")
                             (cpl:sleep urdf-proj::*debug-long-sleep-duration*)
+                            ;; (break)
                             (btr:restore-world-poses world-pose-info)
-                            (cpl:fail 'common-fail:manipulation-goal-in-collision)))))
+                            (when *x*
+                             (cpl:fail 'common-fail:manipulation-goal-in-collision))))))
                     (list left-reach-poses left-grasp-poses left-lift-poses)
                     (list right-reach-poses right-grasp-poses right-lift-poses)
                     (list :avoid-all :allow-hand :avoid-all))))))
 
         (btr:restore-world-poses world-pose-info)))))
-
+(defparameter *x* t)
 
 
 (defun check-placing-collisions (placing-action-desig &optional (retries 3))

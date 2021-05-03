@@ -66,6 +66,7 @@
    #:gripper-closed-completely
    #:gripper-goal-not-reached
    #:manipulation-goal-not-reached
+   #:environment-manipulation-goal-not-reached
    #:manipulation-pose-unreachable
    ;; navigation
    #:navigation-low-level-failure

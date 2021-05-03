@@ -5,6 +5,7 @@
 
 (defun send-load-neem-generation-interface ()
   (let ((path-to-interface-file (concatenate 'string "'"(get-parent-folder-path) "/neem-interface.pl'")))
+    (setf path-to-interface-file "'/home/koralewski/catkin_ws/ros_actual_cram/src/cram/cram_knowrob/cram_cloud_logger/src/neem-interface.pl'")
     (ccl::send-query-1-without-result "ensure_loaded" path-to-interface-file)))
 
 (defun init-logging ()
@@ -77,7 +78,10 @@
 
 (defun stop-episode ()
   (ccl::stop-situation *episode-name*)
-  (send-query-1-without-result "mem_episode_stop" (concatenate 'string "'" (uiop:getenv "KNOWROB_MEMORY_DIR") "'"))
+  (send-query-1-without-result
+   "mem_episode_stop"
+   ;; (concatenate 'string "'" (uiop:getenv "KNOWROB_MEMORY_DIR") "'")
+   "'/home/koralewski/NEW-NEEMS'")
   (setf ccl::*episode-name* nil)
   (setf ccl::*is-logging-enabled* nil))
 

@@ -34,6 +34,8 @@
 (define-condition manipulation-goal-not-reached (manipulation-low-level-failure) ()
   (:documentation "Thrown when after executing the action, goal is still not reached."))
 
+(define-condition environment-manipulation-goal-not-reached (manipulation-low-level-failure) ())
+
 (define-condition manipulation-pose-unreachable (manipulation-low-level-failure) ()
   (:documentation "Thrown when no IK solution can be found."))
 
