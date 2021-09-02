@@ -200,7 +200,8 @@
             :3destimate ;:2destimate
             (if obj-part
                 :handleannotator
-                :3destimate)))))
+                ;; :3destimate
+                :poseuncertainty)))))
 
 (defun find-pose-in-object-designator (object-description)
   (let* ((estimator
@@ -266,7 +267,13 @@
               (:GarnierMineralUltraDry
                :deodorant)
               (:DMRoteBeteSaftBio
-               :juice-box))))
+               :juice-box)
+              (:jmug
+               :j-mug)
+              (:jbigplate
+               :j-big-plate)
+              (:jsmallplate
+               :j-small-plate))))
       (setf rs-answer
             (subst-if `(:type ,cram-type)
                       (lambda (x)
@@ -360,6 +367,8 @@
 
             output-designator))))))
 
+(defvar *rs-result* nil)
+
 (defun call-robosherlock-service (keyword-key-value-pairs-list &key (quantifier :all))
   (declare (type (or keyword number) quantifier))
   (multiple-value-bind (key-value-pairs-list quantifier)
@@ -369,6 +378,7 @@
         (actionlib-client:call-simple-action-client
          'robosherlock-action
          :action-goal (make-robosherlock-query key-value-pairs-list))
+      (setf *rs-result* result)
       (let* ((rs-parsed-result (ensure-robosherlock-result result quantifier status))
              (rs-result (ecase quantifier
                           ((:a :an :the) (make-robosherlock-designator

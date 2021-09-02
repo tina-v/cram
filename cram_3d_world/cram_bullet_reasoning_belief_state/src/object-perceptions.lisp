@@ -103,7 +103,7 @@ just updated. Otherwise a new instance is created."))
                       (btr:assert ?world
                                   (btr:object :mesh ,instance-name ,object-pose
                                               :mesh ,type ;; ,(object-mesh data)
-                                              :mass 0.2 ;; ,(object-mass data)
+                                              :mass 0.0 ;0.2 ;; ,(object-mass data)
                                               ;; :types ,(list type)
                                               ;; :disable-face-culling t
                                               :color ,(if (slot-boundp data 'desig::color)

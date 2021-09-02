@@ -48,6 +48,10 @@
   (<- (man-int:object-type-direct-subtype :cutlery :fork))
   (<- (man-int:object-type-direct-subtype :cutlery :spoon))
 
+  (<- (man-int:object-type-direct-subtype :cup :j-mug))
+  (<- (man-int:object-type-direct-subtype :plate :j-small-plate))
+  (<- (man-int:object-type-direct-subtype :plate :j-big-plate))
+
   (<- (man-int:object-type-direct-subtype :cereal :breakfast-cereal)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,6 +77,12 @@
 (defmethod man-int:get-action-gripper-opening :heuristics 20
     ((object-type (eql :plate)))
   0.02)
+(defmethod man-int:get-action-gripper-opening :heuristics 20
+    ((object-type (eql :j-small-plate)))
+  0.03)
+(defmethod man-int:get-action-gripper-opening :heuristics 20
+    ((object-type (eql :j-big-plate)))
+  0.03)
 (defmethod man-int:get-action-gripper-opening :heuristics 20
     ((object-type (eql :tray)))
   0.02)
@@ -163,23 +173,12 @@
   :lift-translation *lift-offset*
   :2nd-lift-translation *lift-offset*)
 
-(man-int:def-object-type-to-gripper-transforms '(:tray) :right :right-side
+(man-int:def-object-type-to-gripper-transforms '(:tray :plate) :right :right-side
   :grasp-translation `(0.0 ,(- *plate-grasp-y-offset*) ,*plate-grasp-z-offset*)
   :grasp-rot-matrix
   `((0 -1 0)
     (,(- (sin *plate-grasp-roll-offset*)) 0 ,(cos *plate-grasp-roll-offset*))
     (,(- (cos *plate-grasp-roll-offset*)) 0 ,(- (sin *plate-grasp-roll-offset*))))
-  :pregrasp-offsets `(0.0 ,(- *plate-pregrasp-y-offset*) ,*lift-z-offset*)
-  :2nd-pregrasp-offsets `(0.0 ,(- *plate-pregrasp-y-offset*) ,*plate-2nd-pregrasp-z-offset*)
-  :lift-translation *lift-offset*
-  :2nd-lift-translation *lift-offset*)
-
-(man-int:def-object-type-to-gripper-transforms :plate :right :right-side
-  :grasp-translation `(0.0 ,(- *plate-grasp-y-offset*) ,*plate-grasp-z-offset*)
-  :grasp-rot-matrix
-  `((0             -1 0)
-    (,(- (sin *plate-grasp-roll-offset*)) 0  ,(cos *plate-grasp-roll-offset*))
-    (,(- (cos *plate-grasp-roll-offset*)) 0  ,(- (sin *plate-grasp-roll-offset*))))
   :pregrasp-offsets `(0.0 ,(- *plate-pregrasp-y-offset*) ,*lift-z-offset*)
   :2nd-pregrasp-offsets `(0.0 ,(- *plate-pregrasp-y-offset*) ,*plate-2nd-pregrasp-z-offset*)
   :lift-translation *lift-offset*
@@ -282,6 +281,199 @@
   :2nd-pregrasp-offsets `(,*cup-pregrasp-xy-offset* 0.0 0.0)
   :lift-translation *lift-offset*
   :2nd-lift-translation *lift-offset*)
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;; j-mug  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *j-mug-pregrasp-xy-offset* 0.15 "in meters")
+(defparameter *j-mug-grasp-xy-offset* 0.02 "in meters")
+(defparameter *j-mug-grasp-z-offset* 0.0 "in meters")
+(defparameter *j-mug-top-grasp-x-offset* 0.05 "in meters")
+(defparameter *j-mug-top-grasp-z-offset* 0.04 "in meters")
+
+;; TOP grasp
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :top
+  :grasp-translation `(,(- *j-mug-top-grasp-x-offset*) 0.0d0 ,*j-mug-top-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*z-across-y-grasp-rotation*
+  :pregrasp-offsets *lift-offset*
+  :2nd-pregrasp-offsets *lift-offset*
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+;; BOTTOM grasp
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :bottom
+  :grasp-translation `(0 0 ,(- *j-mug-top-grasp-z-offset*))
+  :grasp-rot-matrix man-int:*-z-across-x-grasp-rotation*
+  :pregrasp-offsets *lift-offset*
+  :2nd-pregrasp-offsets *lift-offset*
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+;; SIDE grasp
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :left-side
+  :grasp-translation `(0.0d0 ,(- *j-mug-grasp-xy-offset*) ,*j-mug-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*y-across-z-flipped-grasp-rotation*
+  :pregrasp-offsets `(0.0 ,*j-mug-pregrasp-xy-offset* ,*lift-z-offset*)
+  :2nd-pregrasp-offsets `(0.0 ,*j-mug-pregrasp-xy-offset* 0.0)
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :right-side
+  :grasp-translation `(0.0d0 ,*j-mug-grasp-xy-offset* ,*j-mug-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*-y-across-z-flipped-grasp-rotation*
+  :pregrasp-offsets `(0.0 ,(- *j-mug-pregrasp-xy-offset*) ,*lift-z-offset*)
+  :2nd-pregrasp-offsets `(0.0 ,(- *j-mug-pregrasp-xy-offset*) 0.0)
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+;; BACK grasp
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :back
+  :grasp-translation `(,*j-mug-grasp-xy-offset* 0.0d0 ,*j-mug-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*-x-across-z-grasp-rotation*
+  :pregrasp-offsets `(,(- *j-mug-pregrasp-xy-offset*) 0.0 ,*lift-z-offset*)
+  :2nd-pregrasp-offsets `(,(- *j-mug-pregrasp-xy-offset*) 0.0 0.0)
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+;; FRONT grasp
+(man-int:def-object-type-to-gripper-transforms :j-mug '(:left :right) :front
+  :grasp-translation `(,(- *j-mug-grasp-xy-offset*) 0.0d0 ,*j-mug-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*x-across-z-grasp-rotation*
+  :pregrasp-offsets `(,*j-mug-pregrasp-xy-offset* 0.0 ,*lift-z-offset*)
+  :2nd-pregrasp-offsets `(,*j-mug-pregrasp-xy-offset* 0.0 0.0)
+  :lift-translation *lift-offset*
+  :2nd-lift-translation *lift-offset*)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; J-SMALL-PLATE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *j-small-plate-diameter* 0.2 "in meters")
+(defparameter *j-small-plate-edge* 0.04 "in meters")
+(defparameter *j-small-plate-grasp-xy-offset*
+  (- (/ *j-small-plate-diameter* 2) 0.02) "in meters")
+(defparameter *j-small-plate-grasp-z-offset* 0.0 "in meters")
+(defparameter *j-small-plate-pregrasp-xy-offset* 0.15 "in meters")
+(defparameter *j-small-plate-pregrasp-z-offset*
+  (* (tan (/ pi 6))
+     (+ *j-small-plate-pregrasp-xy-offset* *j-small-plate-edge*))
+  "in meters")
+(defparameter *j-small-plate-2nd-pregrasp-xy-offset* 0.05 "in meters")
+(defparameter *j-small-plate-2nd-pregrasp-z-offset*
+  (* (tan (/ pi 6))
+     (+ *j-small-plate-2nd-pregrasp-xy-offset* *j-small-plate-edge*))
+  "in meters")
+(defparameter *j-small-plate-z-offsets* '(0 0 0.10) "in meters")
+(defparameter *j-small-plate-2nd-z-offsets* '(0 0 0.20) "in meters")
+
+(man-int:def-object-type-to-gripper-transforms :j-small-plate '(:left :right) :left-side
+  :grasp-translation `(0.0 ,*j-small-plate-grasp-xy-offset* ,*j-small-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*y-across-x-grasp-rotation*
+  :pregrasp-offsets `(0.0 ,*j-small-plate-pregrasp-xy-offset* 0.0)
+  :2nd-pregrasp-offsets `(0.0 ,*j-small-plate-2nd-pregrasp-xy-offset* 0.0)
+  :lift-translation *j-small-plate-z-offsets*
+  :2nd-lift-translation *j-small-plate-2nd-z-offsets*)
+
+(man-int:def-object-type-to-gripper-transforms :j-small-plate '(:left :right) :right-side
+  :grasp-translation `(0.0 ,(- *j-small-plate-grasp-xy-offset*) ,*j-small-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*-y-across-x-grasp-rotation*
+  :pregrasp-offsets `(0.0 ,(- *j-small-plate-pregrasp-xy-offset*) 0.0)
+  :2nd-pregrasp-offsets `(0.0 ,(- *j-small-plate-2nd-pregrasp-xy-offset*) 0.0)
+  :lift-translation *j-small-plate-z-offsets*
+  :2nd-lift-translation *j-small-plate-2nd-z-offsets*)
+
+(man-int:def-object-type-to-gripper-transforms :j-small-plate '(:left :right) :front
+  :grasp-translation `(,*j-small-plate-grasp-xy-offset* 0.0 ,*j-small-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*x-across-y-30-deg-grasp-rotation*
+  :pregrasp-offsets `(,*j-small-plate-pregrasp-xy-offset*
+                      0.0
+                      ,*j-small-plate-pregrasp-z-offset*)
+  :2nd-pregrasp-offsets `(,*j-small-plate-2nd-pregrasp-xy-offset*
+                          0.0
+                          ,*j-small-plate-2nd-pregrasp-z-offset*)
+  :lift-translation *j-small-plate-z-offsets*
+  :2nd-lift-translation *j-small-plate-2nd-z-offsets*)
+
+(man-int:def-object-type-to-gripper-transforms :j-small-plate '(:left :right) :back
+  :grasp-translation `(,(- *j-small-plate-grasp-xy-offset*) 0.0 ,*j-small-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*-x-across-y-grasp-rotation*
+  :pregrasp-offsets `(,(- *j-small-plate-pregrasp-xy-offset*) 0.0 0.0)
+  :2nd-pregrasp-offsets `(,(- *j-small-plate-2nd-pregrasp-xy-offset*) 0.0 0.0)
+  :lift-translation *j-small-plate-z-offsets*
+  :2nd-lift-translation *j-small-plate-2nd-z-offsets*)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; J-BIG-PLATE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *j-big-plate-diameter* 0.263 "in meters")
+(defparameter *j-big-plate-edge* 0.05 "in meters")
+(defparameter *j-big-plate-grasp-xy-offset*
+  (- (/ *j-big-plate-diameter* 2) 0.02) "in meters")
+(defparameter *j-big-plate-grasp-z-offset* 0.0 "in meters")
+(defparameter *j-big-plate-pregrasp-xy-offset* 0.15 "in meters")
+(defparameter *j-big-plate-pregrasp-z-offset*
+  (* (tan (/ pi 7.5))
+     (+ *j-big-plate-pregrasp-xy-offset* *j-big-plate-edge*))
+  "in meters")
+(defparameter *j-big-plate-2nd-pregrasp-xy-offset* 0.05 "in meters")
+(defparameter *j-big-plate-2nd-pregrasp-z-offset*
+  (* (/ 2 5)
+     (+ *j-big-plate-2nd-pregrasp-xy-offset* *j-big-plate-edge*))
+  "in meters")
+(defparameter *j-big-plate-z-offsets* '(0 0 0.10) "in meters")
+(defparameter *j-big-plate-2nd-z-offsets* '(0 0 0.20) "in meters")
+
+(man-int:def-object-type-to-gripper-transforms :j-big-plate '(:left :right) :front
+  :grasp-translation `(,*j-big-plate-grasp-xy-offset*
+                       0.0
+                       ,*j-big-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*x-across-y-24-deg-grasp-rotation*
+  :pregrasp-offsets `(,*j-big-plate-pregrasp-xy-offset*
+                      0.0
+                      ,*j-big-plate-pregrasp-z-offset*)
+  :2nd-pregrasp-offsets `(,*j-big-plate-2nd-pregrasp-xy-offset*
+                          0.0
+                          ,*j-big-plate-2nd-pregrasp-z-offset*)
+  :lift-translation *j-big-plate-z-offsets*
+  :2nd-lift-translation *j-big-plate-2nd-z-offsets*)
+
+(man-int:def-object-type-to-gripper-transforms :j-big-plate '(:left :right) :left-side
+  :grasp-translation `(0.0
+                       ,*j-big-plate-grasp-xy-offset*
+                       ,*j-big-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*x-across-y-24-deg-grasp-rotation*
+  :pregrasp-offsets `(0.0
+                      ,*j-big-plate-pregrasp-xy-offset*
+                      ,*j-big-plate-pregrasp-z-offset*)
+  :2nd-pregrasp-offsets `(0.0
+                          ,*j-big-plate-2nd-pregrasp-xy-offset*
+                          ,*j-big-plate-pregrasp-z-offset*)
+  :lift-translation *j-big-plate-z-offsets*
+  :2nd-lift-translation *j-big-plate-2nd-z-offsets*)
+
+(man-int:def-object-type-to-gripper-transforms :j-big-plate '(:left :right) :right-side
+  :grasp-translation `(0.0
+                       ,(- *j-big-plate-grasp-xy-offset*)
+                       ,*j-big-plate-grasp-z-offset*)
+  :grasp-rot-matrix man-int:*x-across-y-24-deg-grasp-rotation*
+  :pregrasp-offsets `(0.0
+                      ,(- *j-big-plate-pregrasp-xy-offset*)
+                      ,*j-big-plate-pregrasp-z-offset*)
+  :2nd-pregrasp-offsets `(0.0
+                          ,(- *j-big-plate-2nd-pregrasp-xy-offset*)
+                          ,*j-big-plate-2nd-pregrasp-z-offset*)
+  :lift-translation *j-big-plate-z-offsets*
+  :2nd-lift-translation *j-big-plate-2nd-z-offsets*)
+
+
+
+
+
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; milk ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
