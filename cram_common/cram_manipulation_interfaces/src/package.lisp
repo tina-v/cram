@@ -95,6 +95,12 @@
    #:def-object-type-in-other-object-transform
    #:get-object-look-from-pose
    ;; standard-grasps
+   #:*sin-30*
+   #:*-sin-30*
+   #:*sin-45*
+   #:*-sin-45*
+   #:*sin-60*
+   #:*-sin-60*
    #:*x-across-z-grasp-rotation*
    #:*x-across-z-grasp-rotation-2*
    #:*-x-across-z-grasp-rotation*
@@ -108,7 +114,11 @@
    #:*y-across-z-flipped-grasp-rotation*
    #:*-y-across-z-flipped-grasp-rotation*
    #:*y-across-x-grasp-rotation*
+   #:*y-across-x-30-deg-grasp-rotation*
    #:*-y-across-x-grasp-rotation*
+   #:*-y-across-x-30-deg-grasp-rotation*
+   #:*-yx-30-deg-grasp-rotation*
+   #:*yx-30-deg-grasp-rotation*
    #:*z-across-x-grasp-rotation*
    #:*z-across-y-grasp-rotation*
    #:*z-diagonal-grasp-rotation*

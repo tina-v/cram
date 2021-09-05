@@ -131,7 +131,7 @@
   (declare (type list joint-state-left joint-state-right)
            (type boolean align-planes-left align-planes-right))
   (make-giskard-goal
-   :constraints (list
+    :constraints (list
                  (make-ee-velocity-constraint
                   :left
                   (if try-harder
@@ -280,12 +280,13 @@
                  :align-planes-right align-planes-right
                  :unmovable-joints unmovable-joints)
    :action-timeout action-timeout
-   :check-goal-function (lambda (result status)
-                          (declare (ignore result status))
-                          (or (ensure-arm-cartesian-goal-reached
-                               goal-pose-left cram-tf:*robot-left-tool-frame*)
-                              (ensure-arm-cartesian-goal-reached
-                               goal-pose-right cram-tf:*robot-right-tool-frame*)))))
+   ;; :check-goal-function (lambda (result status)
+   ;;                        (declare (ignore result status))
+   ;;                        (or (ensure-arm-cartesian-goal-reached
+   ;;                             goal-pose-left cram-tf:*robot-left-tool-frame*)
+   ;;                            (ensure-arm-cartesian-goal-reached
+   ;;                             goal-pose-right cram-tf:*robot-right-tool-frame*)))
+   ))
 
 
 
@@ -309,9 +310,10 @@
                    align-planes-left align-planes-right
                    :try-harder avoid-collisions-not-much)
      :action-timeout action-timeout
-     :check-goal-function (lambda (result status)
-                            (declare (ignore result status))
-                            (or (ensure-arm-joint-goal-reached
-                                 goal-configuration-left :left)
-                                (ensure-arm-joint-goal-reached
-                                 goal-configuration-right :right))))))
+     ;; :check-goal-function (lambda (result status)
+     ;;                        (declare (ignore result status))
+     ;;                        (or (ensure-arm-joint-goal-reached
+     ;;                             goal-configuration-left :left)
+     ;;                            (ensure-arm-joint-goal-reached
+     ;;                             goal-configuration-right :right)))
+     )))
