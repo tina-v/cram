@@ -116,7 +116,7 @@
      ((,*holder-plane-vertical-rad-x*
        ,(- 1.0 *holder-plane-vertical-rad-y*)
        ,*holder-plane-vertical-rad-z*)
-      (0 0 0 1)))
+      (0 0 1 0)))
     (:holder-top-wing
      :holder-top-wing
      ,*yellow-plastic*
@@ -187,7 +187,7 @@
     (:propeller
      :propeller
      ,*yellow-plane*
-     ((0.075 1.10 0) (0 0 0 1)))
+     ((0.075 1.13 0) ,man-int:*rotation-around-z-90-list*))
     (:front-wheel-1
      :front-wheel
      ,*black-plane*
@@ -385,19 +385,16 @@
 
              ;; 10
              (transport :top-wing  '(:range 0.3) :holder-plane-vertical '(:side :left)
-                        ;; or `((,(- *base-x* 0.00) 1.45 0) (0 0 0 1))
                         :vertical-attachment
                         wooden-plate)
 
              ;; 11
              (transport :propeller '(:side :left) :motor-grill '(:side :left)
-                        ;; or `((,(- *base-x* 0.15) 1.8 0) (0 0 0 1))
                         :propeller-attachment
                         wooden-plate)
 
              ;; 12
              (transport :bolt :bolt :propeller '(:side :left)
-                        ;; or `((,*base-x* 1.85 0) (0 0 0 1))
                         :propeller-thread
                         wooden-plate))
         (setf btr:*visibility-threshold* old-visibility)))))
