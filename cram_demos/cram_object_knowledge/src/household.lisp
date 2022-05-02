@@ -587,6 +587,7 @@
                               (location ?location-in-dishwasher)))
              (for (desig:an object
                             (type ?object-type)
+                            ;; need a name because of the attachment
                             (name some-name)))
              (attachments ?attachments))))
 
@@ -672,7 +673,7 @@
                          (type drawer)
                          (urdf-name kitchen-island-left-upper-drawer-main)
                          (part-of ?environment-name)))
-           (side front)))
+           (side back)))
 
 ;;;;;;;; dining table
 

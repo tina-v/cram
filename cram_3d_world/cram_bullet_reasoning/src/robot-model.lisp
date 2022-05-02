@@ -43,7 +43,7 @@
   (make-instance 'colored-box-shape
     :half-extents (cl-transforms:v*
                    (cl-urdf:size box) 0.5)
-    :color (apply-alpha-value color)))
+    :color (apply-alpha-value color *robot-model-alpha*)))
 
 (defmethod urdf-make-collision-shape ((cylinder cl-urdf:cylinder)
                                       &optional (color '(0.8 0.8 0.8 1.0)) (compound nil))
@@ -53,13 +53,13 @@
                    (cl-urdf:radius cylinder)
                    (cl-urdf:radius cylinder)
                    (* 0.5 (cl-urdf:cylinder-length cylinder)))
-    :color (apply-alpha-value color)))
+    :color (apply-alpha-value color *robot-model-alpha*)))
 
 (defmethod urdf-make-collision-shape ((sphere cl-urdf:sphere)
                                       &optional (color '(0.8 0.8 0.8 1.0)) (compound nil))
   (declare (ignore compound))
   (make-instance 'colored-sphere-shape :radius (cl-urdf:radius sphere)
-    :color (apply-alpha-value color)))
+    :color (apply-alpha-value color *robot-model-alpha*)))
 
 (defmethod urdf-make-collision-shape ((mesh cl-urdf:mesh)
                                       &optional (color '(0.8 0.8 0.8 1.0)) (compound nil))
@@ -345,7 +345,8 @@ Otherwise, the attachment is only used as information but does not affect the wo
                                                          (cl-urdf:visual link))))
                                                      (let ((some-gray (/ (+ (random 5) 3) 10.0)))
                                                        (list some-gray some-gray some-gray
-                                                             (or *robot-model-alpha* 1.0)))))
+                                                             (or *robot-model-alpha* 1.0))))
+                                                 *robot-model-alpha*)
                                                 compound)
                               :collision-flags :cf-default
                               :group collision-group
@@ -763,16 +764,3 @@ Only one joint state changes in this situation, so only one joint state is updat
   (with-slots (urdf) obj
     (setf (link-pose obj (cl-urdf:name (cl-urdf:root-link urdf)))
           new-value)))
-
-(defmacro with-alpha (alpha &body body)
-  `(let ((*robot-model-alpha* ,alpha))
-     ,@body))
-
-(defun apply-alpha-value (color)
-  (if (= (length color) 4)
-      (destructuring-bind (r g b a) color
-        (list r g b (or *robot-model-alpha* a)))
-      (if (= (length color) 3)
-          (destructuring-bind (r g b) color
-            (list r g b (or *robot-model-alpha* 1.0)))
-          (error "Color of an object has to be a list of 3 or 4 values"))))
