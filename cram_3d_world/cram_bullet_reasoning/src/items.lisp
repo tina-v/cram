@@ -57,6 +57,14 @@
     (:glasses "package://cram_bullet_reasoning/resource/glasses.stl" nil)
     (:glove "package://cram_bullet_reasoning/resource/glove.stl" nil)
     (:shoe "package://cram_bullet_reasoning/resource/shoe.stl" nil)
+  (:whisk "package://cram_pr2_whip_demo/resource/whisk.stl" nil)
+    (:big-bowl "package://cram_pr2_whip_demo/resource/big-bowl.stl" nil)
+    (:saucepan "package://cram_pr2_whip_demo/resource/saucepan.stl" nil)   
+    (:bowl-round "package://cram_bullet_reasoning/resource/bowl_round.stl" nil)
+    (:ladle "package://cram_bullet_reasoning/resource/ladle.stl" nil)
+   (:tea-spoon "package://cram_bullet_reasoning/resource/tea-spoon.stl" nil)
+   (:wine-glas "package://cram_bullet_reasoning/resource/wine-glas.stl" nil)
+)
     (:sponge "package://cram_bullet_reasoning/resource/sponge.stl" nil)
     (:arrow "package://cram_bullet_reasoning/resource/arrow.stl" nil))
   "(mesh-name-in-CRAM  mesh-ROS-uri-path  flip-winding-order-of-the-mesh")
@@ -199,6 +207,24 @@ than one item."
                                  :attachment-type attachment-type :loose loose))
                 (cdr other-objects)))
       (warn "Trying to attach an object to a NIL.")))
+
+(defmethod attach-object ((other-objects list) (object item)
+                          &key attachment-type loose)
+  "Will be used if an attachment should be made from one item to more
+than one item. If `loose' T the other attachments have to be made with
+`skip-removing-loose' as T to prevent removing loose attachments between
+the element before in `other-objects' and `object'."
+  (if other-objects
+      (progn
+        (attach-object (first other-objects) object
+                       :attachment-type attachment-type :loose loose)
+        (mapcar (lambda (obj)
+                  (attach-object obj object
+                                 :attachment-type attachment-type :loose loose
+                                 :skip-removing-loose T))
+                (cdr other-objects)))
+      (warn "Trying to attach an object to a NIL.")))
+
 
 (defmethod detach-object ((other-object item) (object item) &key)
   "Removes item names from the given arguments in the corresponding
@@ -503,6 +529,7 @@ The length, width and height have to be given for the function to work."
                 :collision-shape (make-instance 'colored-sphere-shape
                                    :radius radius
                                    :color color)))))
+
 
 (defmethod add-object ((world bt-world) (type (eql :apple)) name pose
                        &key mass (color '(0.5 0.5 0.5 1.0)) radius)
